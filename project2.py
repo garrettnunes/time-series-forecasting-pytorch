@@ -82,15 +82,37 @@ config = {
 }
 
 def download_data(config):
-    ts = TimeSeries(key=config["alpha_vantage"]["key"])
-    data, meta_data = ts.get_daily_adjusted(config["alpha_vantage"]["symbol"], outputsize=config["alpha_vantage"]["outputsize"])
+    # ts = TimeSeries(key=config["alpha_vantage"]["key"])
+    # data, meta_data = ts.get_daily_adjusted(config["alpha_vantage"]["symbol"], outputsize=config["alpha_vantage"]["outputsize"])
+    
+    
+    
+    
+    # data = client.timeframe(start_date='2024-02-05', end_date='2024-02-09', base='USD', currencies=['ALU'])
+    # print(data)
+    # exit()
 
-    data_date = [date for date in data.keys()]
+    data = {'success': True, 'base': 'USD', 'start_date': '2024-02-05', 'end_date': '2024-02-09', 'rates': {'2024-02-05': {'ALU': 16.0020091086}, '2024-02-06': {'ALU': 15.8242934562}, '2024-02-07': {'ALU': 15.8940972073}, '2024-02-08': {'ALU': 15.8754349179}, '2024-02-09': {'ALU': 15.9278735741}}}
+    
+    
+    
+    # print(data)
+    # exit()
+
+    # '2003-01-13': {'1. open': '88.31', '2. high': '88.95', '3. low': '87.35', '4. close': '87.51', '5. adjusted close': '46.3373710065631', '6. volume': '10499000', '7. dividend amount': '0.0000', '8. split coefficient': '1.0'}, 
+
+    data_date = [date for date in data['rates'].keys()]
     data_date.reverse()
 
-    data_close_price = [float(data[date][config["alpha_vantage"]["key_adjusted_close"]]) for date in data.keys()]
+    print(data_date)
+
+    data_close_price = [float(data['rates'][date]["ALU"]) for date in data['rates'].keys()]
     data_close_price.reverse()
     data_close_price = np.array(data_close_price)
+
+    # data_close_price = [float(data[date][config["alpha_vantage"]["key_adjusted_close"]]) for date in data.keys()]
+    # data_close_price.reverse()
+    # data_close_price = np.array(data_close_price)
 
     num_data_points = len(data_date)
     display_date_range = "from " + data_date[0] + " to " + data_date[num_data_points-1]
@@ -128,6 +150,7 @@ class Normalizer():
 
 # normalize
 scaler = Normalizer()
+print(data_close_price)
 normalized_data_close_price = scaler.fit_transform(data_close_price)
 
 def prepare_data_x(x, window_size):
@@ -145,6 +168,7 @@ def prepare_data_y(x, window_size):
     output = x[window_size:]
     return output
 
+print(normalized_data_close_price)
 data_x, data_x_unseen = prepare_data_x(normalized_data_close_price, window_size=config["data"]["window_size"])
 data_y = prepare_data_y(normalized_data_close_price, window_size=config["data"]["window_size"])
 

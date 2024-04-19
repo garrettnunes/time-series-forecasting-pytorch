@@ -12,11 +12,43 @@ from matplotlib.pyplot import figure
 
 from alpha_vantage.timeseries import TimeSeries
 
+import requests
+
+from metalpriceapi.client import Client
+api_key = '6600ef8939cd5025b77e8909bb3d1a6d'
+client = Client(api_key)
+
+# data = client.timeframe(start_date='2024-02-05', end_date='2024-02-09', base='USD', currencies=['ALU'])
+# print(data)
+# exit()
+
+# # replace the "demo" apikey below with your own key from https://www.alphavantage.co/support/#api-key
+# url = 'https://www.alphavantage.co/query?function=ALUMINUM&interval=monthly&apikey=demo'
+# rl = 'https://www.alphavantage.co/query?function=ALUMINUM&interval=monthly&apikey=demo'
+# r = requests.get(url)
+# data = r.json()
+
+
+
+# from alpha_vantage.timeseries import TimeSeries
+
+# key = 'your_api_key'
+# ts = TimeSeries(key, output_format='pandas')
+# data, meta_data = ts.get_daily_adjusted('ALUMINUM', outputsize='full')
+
+
+# metalpriceapi.com key - 6600ef8939cd5025b77e8909bb3d1a6d
+
+# print(data)
+
 print("All libraries loaded")
 
+# FREE - 8368BHI5PDJQKUOV
+# PREMIUM - O43FB23TXRWT1Q0C
 config = {
     "alpha_vantage": {
-        "key": "YOUR_API_KEY", # Claim your free API key here: https://www.alphavantage.co/support/#api-key
+        "key": "O43FB23TXRWT1Q0C", # Claim your free API key here: https://www.alphavantage.co/support/#api-key
+        # "symbol": "LME-ALU",
         "symbol": "IBM",
         "outputsize": "full",
         "key_adjusted_close": "5. adjusted close",
@@ -50,15 +82,37 @@ config = {
 }
 
 def download_data(config):
-    ts = TimeSeries(key=config["alpha_vantage"]["key"])
-    data, meta_data = ts.get_daily_adjusted(config["alpha_vantage"]["symbol"], outputsize=config["alpha_vantage"]["outputsize"])
+    # ts = TimeSeries(key=config["alpha_vantage"]["key"])
+    # data, meta_data = ts.get_daily_adjusted(config["alpha_vantage"]["symbol"], outputsize=config["alpha_vantage"]["outputsize"])
+    
+    
+    
+    
+    # data = client.timeframe(start_date='2024-02-05', end_date='2024-02-09', base='USD', currencies=['ALU'])
+    # print(data)
+    # exit()
 
-    data_date = [date for date in data.keys()]
+    data = {'success': True, 'base': 'USD', 'start_date': '2024-02-05', 'end_date': '2024-02-09', 'rates': {'2024-02-05': {'ALU': 16.0020091086}, '2024-02-06': {'ALU': 15.8242934562}, '2024-02-07': {'ALU': 15.8940972073}, '2024-02-08': {'ALU': 15.8754349179}, '2024-02-09': {'ALU': 15.9278735741}}}
+    
+    
+    
+    # print(data)
+    # exit()
+
+    # '2003-01-13': {'1. open': '88.31', '2. high': '88.95', '3. low': '87.35', '4. close': '87.51', '5. adjusted close': '46.3373710065631', '6. volume': '10499000', '7. dividend amount': '0.0000', '8. split coefficient': '1.0'}, 
+
+    data_date = [date for date in data['rates'].keys()]
     data_date.reverse()
 
-    data_close_price = [float(data[date][config["alpha_vantage"]["key_adjusted_close"]]) for date in data.keys()]
+    print(data_date)
+
+    data_close_price = [float(data['rates'][date]["ALU"]) for date in data['rates'].keys()]
     data_close_price.reverse()
     data_close_price = np.array(data_close_price)
+
+    # data_close_price = [float(data[date][config["alpha_vantage"]["key_adjusted_close"]]) for date in data.keys()]
+    # data_close_price.reverse()
+    # data_close_price = np.array(data_close_price)
 
     num_data_points = len(data_date)
     display_date_range = "from " + data_date[0] + " to " + data_date[num_data_points-1]
@@ -77,7 +131,7 @@ xticks = [data_date[i] if ((i%config["plots"]["xticks_interval"]==0 and (num_dat
 x = np.arange(0,len(xticks))
 plt.xticks(x, xticks, rotation='vertical')
 plt.title("Daily close price for " + config["alpha_vantage"]["symbol"] + ", " + display_date_range)
-plt.grid(b=None, which='major', axis='y', linestyle='--')
+plt.grid(which='major', axis='y', linestyle='--')
 plt.show()
 
 class Normalizer():
@@ -145,7 +199,7 @@ xticks = [data_date[i] if ((i%config["plots"]["xticks_interval"]==0 and (num_dat
 x = np.arange(0,len(xticks))
 plt.xticks(x, xticks, rotation='vertical')
 plt.title("Daily close prices for " + config["alpha_vantage"]["symbol"] + " - showing training and validation data")
-plt.grid(b=None, which='major', axis='y', linestyle='--')
+plt.grid(which='major', axis='y', linestyle='--')
 plt.legend()
 plt.show()
 
@@ -316,7 +370,7 @@ plt.title("Compare predicted prices to actual prices")
 xticks = [data_date[i] if ((i%config["plots"]["xticks_interval"]==0 and (num_data_points-i) > config["plots"]["xticks_interval"]) or i==num_data_points-1) else None for i in range(num_data_points)] # make x ticks nice
 x = np.arange(0,len(xticks))
 plt.xticks(x, xticks, rotation='vertical')
-plt.grid(b=None, which='major', axis='y', linestyle='--')
+plt.grid(which='major', axis='y', linestyle='--')
 plt.legend()
 plt.show()
 
@@ -336,7 +390,7 @@ plt.title("Zoom in to examine predicted price on validation data portion")
 xticks = [to_plot_data_date[i] if ((i%int(config["plots"]["xticks_interval"]/5)==0 and (len(to_plot_data_date)-i) > config["plots"]["xticks_interval"]/6) or i==len(to_plot_data_date)-1) else None for i in range(len(to_plot_data_date))] # make x ticks nice
 xs = np.arange(0,len(xticks))
 plt.xticks(xs, xticks, rotation='vertical')
-plt.grid(b=None, which='major', axis='y', linestyle='--')
+plt.grid(which='major', axis='y', linestyle='--')
 plt.legend()
 plt.show()
 
@@ -375,7 +429,7 @@ plt.plot(plot_date_test, to_plot_data_y_val, label="Actual prices", marker=".", 
 plt.plot(plot_date_test, to_plot_data_y_val_pred, label="Past predicted prices", marker=".", markersize=10, color=config["plots"]["color_pred_val"])
 plt.plot(plot_date_test, to_plot_data_y_test_pred, label="Predicted price for next day", marker=".", markersize=20, color=config["plots"]["color_pred_test"])
 plt.title("Predicting the close price of the next trading day")
-plt.grid(b=None, which='major', axis='y', linestyle='--')
+plt.grid(which='major', axis='y', linestyle='--')
 plt.legend()
 plt.show()
 

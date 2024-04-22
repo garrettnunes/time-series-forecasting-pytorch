@@ -4,6 +4,7 @@ from email.mime.text import MIMEText
 from email.utils import formataddr
 from email.mime.base import MIMEBase
 from email import encoders
+import os
 
 class email():
     def __init__(self):
@@ -19,7 +20,7 @@ class email():
                 smtpserver.ehlo()
                 smtpserver.starttls()
                 smtpserver.login(
-                    )
+                    'apikey', os.environ['SENDGRID_KEY'])
                 msg = MIMEMultipart('alternative')
                 msg['Subject'] = mail_subject
                 # msg['From'] = mail_from

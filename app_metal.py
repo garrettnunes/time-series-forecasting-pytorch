@@ -21,45 +21,18 @@ from metalpriceapi.client import Client
 from dotenv import load_dotenv
 load_dotenv()
 
-# api_key = '6600ef8939cd5025b77e8909bb3d1a6d'
-# client = Client(api_key)
-
-# data = client.timeframe(start_date='2024-02-05', end_date='2024-02-09', base='USD', currencies=['ALU'])
-# print(data)
-# exit()
-
-# # replace the "demo" apikey below with your own key from https://www.alphavantage.co/support/#api-key
-# url = 'https://www.alphavantage.co/query?function=ALUMINUM&interval=monthly&apikey=demo'
-# rl = 'https://www.alphavantage.co/query?function=ALUMINUM&interval=monthly&apikey=demo'
-# r = requests.get(url)
-# data = r.json()
-
-
-
-# from alpha_vantage.timeseries import TimeSeries
-
-# key = 'your_api_key'
-# ts = TimeSeries(key, output_format='pandas')
-# data, meta_data = ts.get_daily_adjusted('ALUMINUM', outputsize='full')
-
-
-# metalpriceapi.com key - 6600ef8939cd5025b77e8909bb3d1a6d
-
-# print(data)
 
 print("All libraries loaded")
 
-# FREE - 8368BHI5PDJQKUOV
-# PREMIUM - O43FB23TXRWT1Q0C
+
 config = {
     "api": {
-        "key": "6600ef8939cd5025b77e8909bb3d1a6d", # Claim your free API key here: https://www.alphavantage.co/support/#api-key
-        # "symbol": "LME-ALU",
+        "key": "6600ef8939cd5025b77e8909bb3d1a6d", # Metal Price API
         "symbol": "ALU",
         "outputsize": "full",
         "key_adjusted_close": "5. adjusted close",
         "refresh": False,
-        "notification": True,
+        "notification": False,
         "mail_to": ["garrett@fazer.tech","bnichols@natalloys.com","twalters@natalloys.com"]
     },
     "data": {
@@ -90,32 +63,18 @@ config = {
     }
 }
 
+
 def convert_kilogram_to_tonne(price):
-    print(f'price0: {price}')
-    
     price = price/1000
-    price = 1/price
-    print(f'price_1: {price}')
-    
-    
-    # price = 1/price
-    # print(f'price1: {price}')
-    # price = price * 0.001
-    # print(f'price2: {price}')
-    # price = 1/price
-    # print(f'price3: {price}')
-    
+    price = 1/price    
     return price
 
-def download_data(config):
-    
-    
-    
-    
-    
-    ticker = config["api"]["symbol"]
-    filename = f'data_{ticker}.json'
 
+def download_data(config):
+    # Get ticker symbol
+    ticker = config["api"]["symbol"]
+    # Create filename
+    filename = f'data_{ticker}.json'
     try:
         # Load the JSON data into a Python dictionary
         with open(filename, 'r') as f:
@@ -127,22 +86,16 @@ def download_data(config):
             f.write(json_data)
         with open(filename, 'r') as f:
             data = json.load(f)
-    
-    # client = Client(config["api"]["key"])
 
     if config["api"]["refresh"] == True:
         year = 2024
         
         client = Client(config["api"]["key"])
-
         new_data = client.timeframe(start_date=f'{year}-01-01', end_date=f'{year}-12-31', base='USD', currencies=[config["api"]["symbol"]], unit="kilogram")
         new_data = new_data['rates']
 
         # Get rid of any data that is empty
         new_data = {k: v for k, v in new_data.items() if config["api"]["symbol"] in v}
-        
-        print('new_data')
-        print(new_data)
 
         # Check if the keys exist and if not add
         for x in new_data:
@@ -162,55 +115,13 @@ def download_data(config):
             f.write(json_data)
             
 
-    
-    
-    
-    
-    
-    
-    ### SORT DATA SO MUST RECENT IS FIRST
-    # data = dict(sorted(data.items(), reverse=True))
-    # print(data)
-    # exit()
-    
-    
-    
-    
-    # ts = TimeSeries(key=config["alpha_vantage"]["key"])
-    # data, meta_data = ts.get_daily_adjusted(config["alpha_vantage"]["symbol"], outputsize=config["alpha_vantage"]["outputsize"])
-    
-    
-    
-    
-    # data = client.timeframe(start_date='2023-01-01', end_date='2023-12-31', base='USD', currencies=['ALU'])
-    # data = data['rates']
-    # print(data)
-    # exit()
-    
-    
-
-    # data = {'success': True, 'base': 'USD', 'start_date': '2024-02-05', 'end_date': '2024-02-09', 'rates': {'2024-02-05': {'ALU': 16.0020091086}, '2024-02-06': {'ALU': 15.8242934562}, '2024-02-07': {'ALU': 15.8940972073}, '2024-02-08': {'ALU': 15.8754349179}, '2024-02-09': {'ALU': 15.9278735741}}}
-    
-    
-    
-    # print(data)
-    # exit()
-
-    # '2003-01-13': {'1. open': '88.31', '2. high': '88.95', '3. low': '87.35', '4. close': '87.51', '5. adjusted close': '46.3373710065631', '6. volume': '10499000', '7. dividend amount': '0.0000', '8. split coefficient': '1.0'}, 
-
     data_date = [date for date in data.keys()]
     data_date.reverse()
-
-    # print(data_date)
 
     # data_close_price = [float(data[date][config["api"]["symbol"]]) for date in data.keys()]
     data_close_price = [float(convert_kilogram_to_tonne(data[date][config["api"]["symbol"]])) for date in data.keys()]
     data_close_price.reverse()
     data_close_price = np.array(data_close_price)
-
-    # data_close_price = [float(data[date][config["alpha_vantage"]["key_adjusted_close"]]) for date in data.keys()]
-    # data_close_price.reverse()
-    # data_close_price = np.array(data_close_price)
 
     num_data_points = len(data_date)
     display_date_range = "from " + data_date[0] + " to " + data_date[num_data_points-1]
@@ -218,17 +129,11 @@ def download_data(config):
 
     return data_date, data_close_price, num_data_points, display_date_range
 
+
 data_date, data_close_price, num_data_points, display_date_range = download_data(config)
 
 
-
-
-
-
-
-
 # plot
-
 fig = figure(figsize=(25, 5), dpi=80)
 fig.patch.set_facecolor((1.0, 1.0, 1.0))
 plt.plot(data_date, data_close_price, color=config["plots"]["color_actual"])
@@ -272,7 +177,7 @@ def prepare_data_x(x, window_size):
 
 def prepare_data_y(x, window_size):
     # # perform simple moving average
-    # output = np.convolve(x, np.ones(window_size), 'valid') / window_size
+    output = np.convolve(x, np.ones(window_size), 'valid') / window_size
 
     # use the next day as label
     output = x[window_size:]

@@ -91,31 +91,14 @@ config = {
 }
 
 def convert_kilogram_to_tonne(price):
-    print(f'price0: {price}')
-    
     price = price/1000
     price = 1/price
-    print(f'price_1: {price}')
-    
-    
-    # price = 1/price
-    # print(f'price1: {price}')
-    # price = price * 0.001
-    # print(f'price2: {price}')
-    # price = 1/price
-    # print(f'price3: {price}')
-    
     return price
 
 def download_data(config):
-    
-    
-    
-    
-    
+
     ticker = config["api"]["symbol"]
     filename = f'data_{ticker}.json'
-
     try:
         # Load the JSON data into a Python dictionary
         with open(filename, 'r') as f:

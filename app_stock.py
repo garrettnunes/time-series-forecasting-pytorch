@@ -17,33 +17,10 @@ import json
 from email_stock import email
 
 
-
 from metalpriceapi.client import Client
 api_key = '6600ef8939cd5025b77e8909bb3d1a6d'
 client = Client(api_key)
 
-# data = client.timeframe(start_date='2024-02-05', end_date='2024-02-09', base='USD', currencies=['ALU'])
-# print(data)
-# exit()
-
-# # replace the "demo" apikey below with your own key from https://www.alphavantage.co/support/#api-key
-# url = 'https://www.alphavantage.co/query?function=ALUMINUM&interval=monthly&apikey=demo'
-# rl = 'https://www.alphavantage.co/query?function=ALUMINUM&interval=monthly&apikey=demo'
-# r = requests.get(url)
-# data = r.json()
-
-
-
-# from alpha_vantage.timeseries import TimeSeries
-
-# key = 'your_api_key'
-# ts = TimeSeries(key, output_format='pandas')
-# data, meta_data = ts.get_daily_adjusted('ALUMINUM', outputsize='full')
-
-
-# metalpriceapi.com key - 6600ef8939cd5025b77e8909bb3d1a6d
-
-# print(data)
 
 print("All libraries loaded")
 

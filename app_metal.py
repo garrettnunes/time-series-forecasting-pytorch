@@ -246,8 +246,8 @@ dataset_val = TimeSeriesDataset(data_x_val, data_y_val)
 print("Train data shape", dataset_train.x.shape, dataset_train.y.shape)
 print("Validation data shape", dataset_val.x.shape, dataset_val.y.shape)
 
-train_dataloader = DataLoader(dataset_train, batch_size=config["training"]["batch_size"], shuffle=True)
-val_dataloader = DataLoader(dataset_val, batch_size=config["training"]["batch_size"], shuffle=True)
+# train_dataloader = DataLoader(dataset_train, batch_size=config["training"]["batch_size"], shuffle=True)
+# val_dataloader = DataLoader(dataset_val, batch_size=config["training"]["batch_size"], shuffle=True)
 
 
 class LSTMModel(nn.Module):
